@@ -1,1 +1,1 @@
-# cloud-engineer-training
+# DevOps Cloud Training
