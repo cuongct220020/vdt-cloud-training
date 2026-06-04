@@ -58,11 +58,11 @@
 
 ### Bước 1: Chuẩn bị công cụ và khởi tạo các Namespace
 
-Vì là bản Ubuntu Minimal nên ta cần cài thêm gói công cụ định tuyến `iptables`.
+Vì là bản Ubuntu Minimal nên ta cần cài thêm gói công cụ định tuyến `iptables`, `traceroute`, `iputils-ping`.
 
 ```bash
 # Cập nhật hệ thống và cài đặt iptables
-sudo apt-get update && sudo apt-get install -y iptables traceroute iputils-ping 
+sudo apt-get update && sudo apt-get install -y iptables traceroute iputils-ping
 
 # Tạo 3 network namespace riêng biệt
 sudo ip netns add ns-a
