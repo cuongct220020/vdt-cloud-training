@@ -1,1 +1,1 @@
-# DevOps Cloud Training
+# VDT Cloud 2026 Training

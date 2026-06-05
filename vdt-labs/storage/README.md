@@ -1,4 +1,4 @@
-# Lab03 - Storage trên Virtual Machine & Ceph Cluster - VDT Cloud 2026
+# Lab03 - Linux Storage Fundamentals & Ceph Cluster - VDT Cloud 2026
 
 > Sinh viên: Đặng Tiến Cường - Đại Học Bách Khoa Hà Nội
 
