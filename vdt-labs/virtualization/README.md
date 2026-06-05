@@ -11,7 +11,7 @@
 
 ## Phần 0: Khởi Tạo Hạ Tầng L0 (Trên GCP Cloud Shell)
 
-### 1. Tạo VM Instance có bật ảo hóa lồng (Nested Virtualization)
+### Tạo VM Instance có bật ảo hóa lồng (Nested Virtualization)
 
 Chạy lệnh sau trên GCP Cloud Shell để tạo máy chủ vật lý L0:
 
@@ -34,7 +34,7 @@ gcloud compute instances create cuongct-vm-lab \
     --enable-nested-virtualization
 ```
 
-### 2. SSH vào máy chủ L0 và cài đặt các gói nền tảng
+### SSH vào máy chủ L0 và cài đặt các gói nền tảng
 
 ```bash
 # SSH vào máy L0 từ Cloud Shell
@@ -54,14 +54,14 @@ sudo apt install iputils-ping net-tools libguestfs-tools nano vim -y
 
 **Mục tiêu:** Thao tác tạo, bật/tắt, nhân bản (clone) và tạo điểm khôi phục (snapshot) của máy ảo thông qua CLI.
 
-### 1. Khởi tạo card mạng ảo mặc định của Libvirt
+### 1.1. Khởi tạo card mạng ảo mặc định của Libvirt
 
 ```bash
 sudo virsh net-start default 2>/dev/null || true
 sudo virsh net-autostart default 2>/dev/null || true
 ```
 
-### 2. Tạo máy ảo basic-vm
+### 1.2. Tạo máy ảo host-L1-A
 
 ```bash
 # Tạo thư mục quản lý storage tập trung
@@ -104,7 +104,7 @@ sudo virt-install \
   --noautoconsole
 ```
 
-### 3. Các lệnh điều khiển máy ảo
+### 1.3. Các lệnh điều khiển máy ảo
 
 ```bash
 # Kiểm tra trạng thái máy ảo
@@ -121,7 +121,7 @@ sudo virsh destroy host-L1-A
 sudo virsh undefine host-L1-A --remove-all-storage
 ```
 
-### 4. Tạo Snapshot
+### 1.4. Tạo Snapshot
 
 ```bash
 # Tạo điểm khôi phục
@@ -141,7 +141,7 @@ sudo virsh snapshot-delete host-L1-A snapshot_basic_stable_2
 ```
 ![alt text](image.png)
 
-### 5. Clone VM
+### 1.5. Clone VM
 
 ```bash
 # Máy ảo gốc phải được tắt trước khi clone để đảm bảo toàn vẹn dữ liệu
@@ -176,7 +176,7 @@ sudo virsh dhcp-net-leases default
 
 ![alt text](image-2.png)
 
-## 1. Cấu hình hạ tầng mạng và hot-plug trên máy host L0
+## 2.1. Cấu hình hạ tầng mạng và hot-plug trên máy host L0
 
 ```plaintext
 ==========================================================================================
@@ -245,8 +245,6 @@ sudo virsh domiflist host-L1-B
 ```
 ![alt text](image-3.png)
 
-
-### 3. Cấu hình tự động hoá trên 2 Host VM L1 
 
 Sau khi cắm nóng card mạng ở L0, ta tiến hành cấu hình IP tĩnh cho dải mạng Migration, phân giải tên miền, thiết lập kết nối không mật khẩu và dựng cấu hình Shared Storage thông qua NFS bằng cách sử dụng ổ đĩa Data 10G sẵn có.
 
@@ -408,7 +406,7 @@ Khi hệ thống yêu cầu nhập mật khẩu `123456` và thực hiện thử
 
 ![alt text](image-5.png)
 
-### 4. Thực hiện Live Migration thủ công
+### 2.2. Thực hiện Live Migration thủ công
 
 #### Khởi tạo máy ảo con L2 trên Host L1-A
 
@@ -683,3 +681,19 @@ Từ giao diện Console của máy ảo `nested-vm02` (Host A), tiến hành g�
 ![alt text](image-8.png)
 
 **Kết quả mong đợi:** Gói tin đi thành công, chứng minh đường hầm OVS VLAN 100 xuyên qua Trunking L0 đã hoạt động hoàn hảo.
+
+## Phần 4: Keep Learning (Định hướng Nâng cấp & Tự động hóa)
+
+### 4.1. Nâng cấp cấu hình NIC Host L1-A, L1-B với kiến trúc Tunnel (SDN)
+
+Trong kịch bản thực tế khi 2 Host L1 được đặt ở 2 Subnet khác biệt (ngăn cách bởi Router Layer 3), kết nối Trunking Layer 2 thuần túy sẽ mất tác dụng. Hướng phát triển tiếp theo của tôi là ứng dụng công nghệ Overlay Network (như VXLAN hoặc GRE):
+
+* **Bản chất:** Tận dụng Open vSwitch để thiết lập "đường hầm" (Tunnel). Gói tin Layer 2 (VLAN của máy ảo L2) sẽ được đóng gói (encapsulate) vào bên trong gói tin Layer 3 (UDP) để có thể định tuyến xuyên qua Router giữa 2 Subnet.
+* **Mục tiêu:** Đảm bảo các máy ảo L2 vẫn nhận diện và giao tiếp với nhau trong cùng một dải mạng (Broadcast Domain), ngay cả khi các máy chủ vật lý đang nằm ở 2 Datacenter cách ly hoàn toàn.
+
+### 4.2. Tự động hoá hạ tầng với mô hình IaC (Terraform & Ansible)
+
+Việc cấu hình thủ công trong bài Lab đã giúp tôi nắm vững bản chất hệ thống và kỹ năng khắc phục sự cố (troubleshooting) ở mức Kernel. Tuy nhiên, để đáp ứng triển khai ở quy mô lớn, tôi sẽ chuyển hóa toàn bộ hạ tầng này thành Infrastructure as Code (IaC):
+
+* **Terraform (Provisioning):** Sử dụng code để tự động hóa quá trình gọi API tới Libvirt/GCP. Qua đó, tôi có thể khởi tạo hàng loạt Host L1, cấp phát tài nguyên (CPU, RAM, Disk) và dựng sẵn các Virtual Network/Bridge ở L0 chỉ với một thao tác thực thi thay vì cấu hình XML thủ công.
+* **Ansible (Configuration Management):** Xây dựng các Playbook để tự động hóa việc SSH vào hàng loạt Host L1/L2. Các tác vụ lặp đi lặp lại như cài đặt OVS, thiết lập IP tĩnh, gắn cáp Trunking, tinh chỉnh Iptables sẽ được thực thi đồng loạt, giúp tối ưu hóa thời gian triển khai từ hàng giờ xuống chỉ còn tính bằng giây.
