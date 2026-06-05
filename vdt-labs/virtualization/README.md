@@ -1,4 +1,4 @@
-# Lab 01 - Virtualization Infrastructure with KVM/QEMU, Libvirt, OVS - VDT Cloud 2026
+# Lab 01 - Virtualization Infrastructure - VDT Cloud 2026
 
 > Sinh viên: Đặng Tiến Cường - Đại Học Bách Khoa Hà Nội
 
@@ -8,6 +8,43 @@
 - **Advance**: Tạo 2 VM đóng vai 2 host, tạo 1 VM trên 1 trong 2 host bằng qemu-kvm/libvirt/virsh, rồi thực hiện live migrate sang host còn lại 
 - **Expert**: Dùng openvswitch trên 2 host tạo vlan network trên 2 host, tạo 2 VM trên 2 host, attach interface vlan vào 2 host và ping qua lại giữa 2 VM.
 
+## Phần Tổng Quan: Quy hoạch Kiến trúc Mạng (Network Topology)
+
+Thiết kế hạ tầng mạng được quy hoạch thành 3 phân vùng độc lập nhằm tối ưu I/O và đảm bảo tiêu chuẩn bảo mật trong môi trường Production:
+
+### 1. Bảng Quy Hoạch 3 Mạng Ảo
+
+| Tên Mạng Ảo | Chế độ | Dải IP | Vai Trò & Nhiệm Vụ |
+| --- | --- | --- | --- |
+| `default` | NAT | `192.168.122.0/24` | **Management & Internet:** Cấp Internet cho VM và phục vụ luồng SSH quản trị hệ thống. |
+| `migration-net` | Isolated | `10.10.10.0/24` | **Storage & Live Migration (Advance):** Chuyên chở dữ liệu lưu trữ (NFS) và trạng thái RAM khi thực hiện Live Migrate. |
+| `ovs-trunk-net` | Isolated | Không cấp IP (L0) | **Data/VLAN Network (Expert):** Đóng vai trò Trunk Port (Layer 2) nối 2 Host L1 cho Open vSwitch. |
+
+### 2. Ưu Điểm Thiết Kế (Best Practices)
+
+* **Cô lập hiệu năng & Bảo mật (Advance):** Tách biệt hoàn toàn lưu lượng truyền RAM (không mã hóa) và tải nặng của NFS khỏi mạng quản trị. Điều này ngăn chặn triệt để tình trạng nghẽn cổ chai (bottleneck) làm sập kết nối điều khiển Hypervisor.
+* **Đảm bảo toàn vẹn SDN (Expert):** Việc đặt `ovs-trunk-net` ở chế độ Isolated tạo ra một "đường hầm" Layer 2 trong suốt. Hệ thống tránh được việc các Router/Firewall (NAT) đánh rớt (drop) hoặc bóc tách các frame chứa 802.1Q VLAN Tag, mô phỏng chuẩn xác kiến trúc Trunking thực tế.
+
+### 3. Sơ Đồ Kiến Trúc Mạng Tổng Thể
+
+```text
+                 Internet
+                     |
+              default (NAT)
+            192.168.122.0/24
+                     |
+        +------------+------------+
+        |                         |
+      Host L1-A               Host L1-B
+        |                         |
+        +------ migration-net ----+
+        |       10.10.10.0/24     |
+        |                         |
+        +------ ovs-trunk-net ----+
+                Layer-2 Trunk
+             (Open vSwitch VLAN)
+
+```
 
 ## Phần 0: Khởi Tạo Hạ Tầng L0 (Trên GCP Cloud Shell)
 
