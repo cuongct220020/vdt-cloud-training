@@ -1,0 +1,24 @@
+# App-of-Apps gốc cho tier production — apply TAY lên ArgoCD của cluster production.
+# recurse:false -> chỉ đọc 4 file cấp 1 trong bootstrap/production (các subdir do appset quản lý).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-production
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ongtungduong/gitops-training.git
+    targetRevision: main
+    path: bootstrap/production
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

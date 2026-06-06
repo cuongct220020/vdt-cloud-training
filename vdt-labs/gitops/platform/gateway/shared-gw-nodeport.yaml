@@ -1,0 +1,27 @@
+# NodePort CỐ ĐỊNH 30080 cho shared-gw -> HAProxy trỏ ổn định: HAProxy terminate TLS rồi
+# forward http tới <nodeIP>:30080 (giữ Host header) -> shared-gw route theo *.duongot.work.
+#
+# Service PHỤ, chọn đúng pod proxy của shared-gw. kgateway vẫn tự tạo 1 service NodePort động
+# (giữ nguyên làm fallback) -> thêm service này là ADDITIVE, không phá gateway nếu selector lệch.
+#
+# LƯU Ý cần verify trên cluster lab:
+#   - selector phải khớp label pod proxy của kgateway (chuẩn: gateway.networking.k8s.io/gateway-name)
+#   - targetPort phải = cổng proxy lắng nghe (listener port 80)
+#   kubectl -n kgateway-system get endpoints shared-gw-nodeport   # phải có IP pod proxy
+apiVersion: v1
+kind: Service
+metadata:
+  name: shared-gw-nodeport
+  namespace: kgateway-system
+  labels:
+    app.kubernetes.io/part-of: shared-gw
+spec:
+  type: NodePort
+  selector:
+    gateway.networking.k8s.io/gateway-name: shared-gw
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30080

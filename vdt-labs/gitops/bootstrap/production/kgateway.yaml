@@ -1,0 +1,29 @@
+# kgateway controller — tách khỏi platform appset vì cài KHÔNG ServerSideApply
+# (đúng pattern cài kgateway trên ArgoCD). CRDs do platform appset cài (có SSA).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kgateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: platform
+  source:
+    repoURL: cr.kgateway.dev/kgateway-dev/charts
+    chart: kgateway
+    targetRevision: v2.4.0-main
+    helm:
+      skipCrds: false
+      parameters:
+        - name: controller.image.pullPolicy
+          value: "Always"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kgateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

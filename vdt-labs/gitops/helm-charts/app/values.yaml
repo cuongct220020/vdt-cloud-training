@@ -1,0 +1,47 @@
+# Gateway dùng chung (kgateway) mà các HTTPRoute trỏ tới qua parentRefs.
+gateway:
+  name: shared-gw
+  namespace: kgateway-system
+  sectionName: ""          # tên listener (tuỳ chọn)
+
+# SealedSecret dùng chung cho cả release: envFrom vào MỌI component.
+# encryptedData là ciphertext kubeseal (an toàn commit Git). Overlay env override theo từng env.
+sealedSecret:
+  enabled: true
+  scope: strict            # strict | namespace-wide | cluster-wide
+  encryptedData: {}
+
+# Mỗi component = 1 Deployment (+ Service nếu có port, + ConfigMap nếu có config,
+# + HTTPRoute nếu bật). 1 component  -> single-deployment; nhiều component -> multi-deployment.
+#
+# ĐỂ TRỐNG mặc định: overlay env tự khai báo components (tránh Helm deep-merge để lại
+# component mặc định trong mọi release). Cấu trúc mỗi component:
+#
+# components:
+#   api:                                  # tên component -> hậu tố tài nguyên <release>-api
+#     image:
+#       repository: docker.io/ongtungduong/java-demo
+#       tag: "1.0.0"
+#       pullPolicy: IfNotPresent
+#     replicaCount: 2
+#     port: 8080                          # bỏ trống -> không tạo Service / containerPort
+#     serviceType: ClusterIP
+#     resources:
+#       requests: { cpu: 100m, memory: 256Mi }
+#       limits:   { cpu: 500m, memory: 512Mi }
+#     env:                                # biến môi trường thường (ngoài secret)
+#       LOG_LEVEL: info
+#     config:                             # ConfigMap: mount data thành file tại mountPath
+#       mountPath: /app/config
+#       data:
+#         application.properties: |
+#           server.port=8080
+#     httpRoute:                          # expose qua Gateway dùng chung
+#       enabled: true
+#       hostnames: ["api.example.com"]
+#       pathPrefixes: ["/"]
+#   worker:                               # component không có port -> chỉ Deployment
+#     image: { repository: docker.io/ongtungduong/py-demo, tag: "1.0.0" }
+#     replicaCount: 3
+#     env: { QUEUE: orders }
+components: {}

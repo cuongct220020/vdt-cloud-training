@@ -1,0 +1,45 @@
+# Per-project ApplicationSet (mention-mate, tier=production): quét overlay env -> sinh workload Application.
+# Multi-source CÙNG main (chart + values cùng revision).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: mention-mate
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/ongtungduong/gitops-training.git
+        revision: main
+        directories:
+          - path: "apps/mention-mate/*/overlays/prod"
+  template:
+    metadata:
+      name: '{{ index .path.segments 1 }}-{{ index .path.segments 2 }}-{{ .path.basename }}'
+      labels:
+        project: '{{ index .path.segments 1 }}'
+        app: '{{ index .path.segments 2 }}'
+        env: '{{ .path.basename }}'
+    spec:
+      project: '{{ index .path.segments 1 }}'
+      sources:
+        - repoURL: https://github.com/ongtungduong/gitops-training.git
+          targetRevision: main
+          path: 'helm-charts/app'
+          helm:
+            valueFiles:
+              - '$values/{{ .path.path }}/values.yaml'
+        - repoURL: https://github.com/ongtungduong/gitops-training.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ index .path.segments 1 }}-{{ .path.basename }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

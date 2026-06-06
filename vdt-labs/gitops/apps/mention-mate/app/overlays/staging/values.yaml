@@ -1,0 +1,15 @@
+# mention-mate-app — staging | image test nhẹ: traefik/whoami — backend + worker
+components:
+  backend:
+    image: { repository: traefik/whoami, tag: "v1.10.3" }
+    replicaCount: 2
+    port: 80
+    httpRoute:
+      enabled: true
+      hostnames: ["mention-mate-app-staging.duongot.work"]
+      pathPrefixes: ["/api"]
+  worker:
+    image: { repository: traefik/whoami, tag: "v1.10.3" }
+    replicaCount: 2
+sealedSecret:
+  enabled: false        # repo test: bỏ secret để pod chạy ngay (không cần kubeseal)

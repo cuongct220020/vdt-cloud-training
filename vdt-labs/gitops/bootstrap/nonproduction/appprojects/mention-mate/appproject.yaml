@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: mention-mate
+  namespace: argocd
+spec:
+  description: Project mention-mate (apps/mention-mate/)
+  sourceRepos:
+    - https://github.com/ongtungduong/gitops-training.git
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "mention-mate-*"
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

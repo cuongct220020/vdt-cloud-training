@@ -1,0 +1,15 @@
+{{- $fullname := include "app.fullname" . -}}
+{{- range $name, $c := .Values.components }}
+{{- with $c.config }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $fullname }}-{{ $name }}-config
+  labels:
+    {{- include "app.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+data:
+  {{- toYaml .data | nindent 2 }}
+{{- end }}
+{{- end }}

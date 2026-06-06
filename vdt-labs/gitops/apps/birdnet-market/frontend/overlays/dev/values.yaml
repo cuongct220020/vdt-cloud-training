@@ -1,0 +1,14 @@
+# birdnet-market-frontend — dev | image test nhẹ: traefik/whoami (echo request để kiểm tra route)
+components:
+  app:
+    image:
+      repository: traefik/whoami
+      tag: "v1.10.3"
+    replicaCount: 1
+    port: 80
+    httpRoute:
+      enabled: true
+      hostnames: ["birdnet-market-frontend-dev.duongot.work"]
+      pathPrefixes: ["/"]
+sealedSecret:
+  enabled: false        # repo test: bỏ secret để pod chạy ngay (không cần kubeseal)

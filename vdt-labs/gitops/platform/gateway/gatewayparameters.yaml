@@ -1,0 +1,13 @@
+# Tham số hạ tầng cho Gateway shared-gw: service nội bộ ClusterIP.
+# Entrypoint ngoài CHỈ qua Service NodePort cố định shared-gw-nodeport (:30080) -> HAProxy trỏ tới đó.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: shared-gw-params
+  namespace: kgateway-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  kube:
+    service:
+      type: ClusterIP

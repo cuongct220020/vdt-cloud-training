@@ -1,0 +1,42 @@
+{{- $fullname := include "app.fullname" . -}}
+{{- range $name, $c := .Values.components }}
+{{- if and $c.httpRoute $c.httpRoute.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $fullname }}-{{ $name }}
+  labels:
+    {{- include "app.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  # Gateway dùng chung (khác namespace) — Gateway phải mở allowedRoutes.namespaces (from: All/Selector)
+  parentRefs:
+    # group/kind ghi rõ = giá trị apiserver default -> tránh ArgoCD OutOfSync triền miên
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: {{ $.Values.gateway.name }}
+      namespace: {{ $.Values.gateway.namespace }}
+      {{- with $.Values.gateway.sectionName }}
+      sectionName: {{ . }}
+      {{- end }}
+  {{- with $c.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - matches:
+        {{- range ($c.httpRoute.pathPrefixes | default (list "/")) }}
+        - path:
+            type: PathPrefix
+            value: {{ . | quote }}
+        {{- end }}
+      backendRefs:
+        # group/kind/weight ghi rõ = giá trị apiserver default -> tránh OutOfSync
+        - group: ""
+          kind: Service
+          name: {{ $fullname }}-{{ $name }}
+          port: {{ required (printf "component %q cần 'port' khi bật httpRoute" $name) $c.port }}
+          weight: 1
+{{- end }}
+{{- end }}

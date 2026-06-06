@@ -1,0 +1,36 @@
+# App-of-Apps cho AppProject: appset quét bootstrap/production/appprojects/* -> mỗi project 1 App
+# deploy manifest AppProject (ApplicationSet chỉ sinh được Application).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appprojects
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/ongtungduong/gitops-training.git
+        revision: main
+        directories:
+          - path: "bootstrap/production/appprojects/*"
+  template:
+    metadata:
+      name: 'appproject-{{ .path.basename }}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/ongtungduong/gitops-training.git
+        targetRevision: main
+        path: '{{ .path.path }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

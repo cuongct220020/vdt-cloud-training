@@ -1,0 +1,36 @@
+# App-of-ApplicationSets: appset quét bootstrap/nonproduction/project-appsets/* -> mỗi project 1 App
+# deploy ApplicationSet của project đó (rồi appset project sinh workload Application).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: all-projects
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/ongtungduong/gitops-training.git
+        revision: main
+        directories:
+          - path: "bootstrap/nonproduction/project-appsets/*"
+  template:
+    metadata:
+      name: 'projectset-{{ .path.basename }}'
+      annotations:
+        argocd.argoproj.io/sync-wave: "0"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/ongtungduong/gitops-training.git
+        targetRevision: main
+        path: '{{ .path.path }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

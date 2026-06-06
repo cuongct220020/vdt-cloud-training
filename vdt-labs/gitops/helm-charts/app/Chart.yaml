@@ -1,0 +1,12 @@
+apiVersion: v2
+name: app
+description: >-
+  Golden base chart đa năng (multi-deployment) — render ConfigMap, SealedSecret,
+  Deployment, Service và HTTPRoute (qua Gateway dùng chung). 1 chart duy nhất cho mọi app.
+type: application
+# Field version là bắt buộc của Helm nhưng KHÔNG dùng để pin: cả lab chỉ 1 chart.
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: Viettel Platform Team
+    email: platform@viettel.vn

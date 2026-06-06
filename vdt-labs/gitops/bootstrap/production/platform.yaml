@@ -1,0 +1,57 @@
+# Platform ApplicationSet: sinh Application cho sealed-secrets + kgateway-crds.
+# kgateway controller tách riêng (kgateway.yaml) vì cài KHÔNG ServerSideApply
+# (pattern cài kgateway trên ArgoCD: CRDs dùng SSA, controller thì không).
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - list:
+        elements:
+          - name: sealed-secrets-controller
+            repoURL: https://bitnami-labs.github.io/sealed-secrets
+            chart: sealed-secrets
+            version: 2.18.6
+            namespace: kube-system
+            wave: "-1"
+            helmValues: |
+              fullnameOverride: sealed-secrets-controller
+          - name: kgateway-crds
+            repoURL: cr.kgateway.dev/kgateway-dev/charts
+            chart: kgateway-crds
+            version: v2.4.0-main
+            namespace: kgateway-system
+            wave: "-1"
+            helmValues: ""
+  template:
+    metadata:
+      name: '{{.name}}'
+      labels:
+        platform-component: '{{.name}}'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{.wave}}'
+    spec:
+      project: platform
+      source:
+        repoURL: '{{.repoURL}}'
+        chart: '{{.chart}}'
+        targetRevision: '{{.version}}'
+        helm:
+          skipCrds: false
+          values: '{{.helmValues}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.namespace}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true
