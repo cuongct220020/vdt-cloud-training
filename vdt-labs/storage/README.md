@@ -16,110 +16,135 @@
 - **Nền tảng:** Google Cloud Platform (GCP)
 - **Công cụ sử dụng:** `fdisk`, `mkfs`, `mount`, `resize2fs`, `df`
 
-
-### Bước 1: Tạo VM và thêm Disk mới 1 GB
-
-Truy cập GCP Console, tạo một VM instance mới (hoặc sử dụng VM hiện có) rồi thêm một **Persistent Disk** mới dung lượng **1 GB** vào VM.
+### Bước 1. Tạo VM và gắn Raw Disk
 
 ```bash
-# Kiểm tra các disk hiện có trên VM sau khi gắn disk mới
+gcloud compute instances create cuongct-storage-lab \
+    --project=project-e8563bf4-58ff-402f-ac1 \
+    --zone=asia-southeast1-b \
+    --machine-type=n2-standard-4 \
+    --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=default \
+    --metadata=enable-osconfig=TRUE \
+    --maintenance-policy=MIGRATE \
+    --provisioning-model=STANDARD \
+    --service-account=1058769778175-compute@developer.gserviceaccount.com \
+    --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/trace.append \
+    --create-disk=auto-delete=yes,boot=yes,device-name=cuongct-vm-lab,image=projects/ubuntu-os-cloud/global/images/ubuntu-minimal-2404-noble-amd64-v20260517,mode=rw,size=40,type=pd-balanced \
+    --create-disk=auto-delete=yes,device-name=disk-basic-1gb,mode=rw,size=5,type=pd-balanced \
+    --create-disk=auto-delete=yes,device-name=ceph-osd-1,mode=rw,size=10,type=pd-balanced \
+    --create-disk=auto-delete=yes,device-name=ceph-osd-2,mode=rw,size=10,type=pd-balanced \
+    --create-disk=auto-delete=yes,device-name=ceph-osd-3,mode=rw,size=10,type=pd-balanced \
+    --no-shielded-secure-boot \
+    --shielded-vtpm \
+    --shielded-integrity-monitoring \
+    --reservation-affinity=any
+
+# Thực hiện SSH vào server
+gcloud compute ssh cuongct-storage-lab 
+
+# Kiểm tra các disk hiện có và mount point
 lsblk
+df -h
+ls -lha /mnt/
 ```
-
-> **Output `lsblk`:**
->
-> _(Chèn ảnh output tại đây)_
-
----
+![alt text](image.png)
 
 ### Bước 2: Tạo Partition và định dạng Filesystem
 
 ```bash
 # Tạo partition mới trên disk vừa gắn (ví dụ /dev/sdb)
 sudo fdisk /dev/sdb
+# [Các bước trong fdisk: 
+# Nhập 'n' để tạo partition mới
+#     -> Chọn 'p' -> Nhập '1' -> First Sector: Enter -> Last Sector: +1G 
+#     -> Chọn 'N' -> # Nhập 'w' để lưu]
+
 
 # Định dạng partition vừa tạo với filesystem ext4
 sudo mkfs.ext4 /dev/sdb1
 ```
 
-> **Output `mkfs.ext4`:**
->
-> _(Chèn ảnh output tại đây)_
-
-
+![alt text](image-1.png)
 ### Bước 3: Mount partition và đọc/ghi dữ liệu
 
 ```bash
 # Tạo thư mục mount point
-sudo mkdir -p /mnt/data-disk
+sudo mkdir -p /mnt/data
 
 # Mount partition vào thư mục
-sudo mount /dev/sdb1 /mnt/data-disk
+sudo mount /dev/sdb1 /mnt/data
 
 # Kiểm tra partition đã được mount thành công
 df -h
+ls -lha /mnt/
 ```
+![alt text](image-2.png)
 
-> **Output `df -h` — Partition 1 GB:**
->
-> _(Chèn ảnh output tại đây)_
 
 ```bash
-# Thực hiện ghi dữ liệu vào partition
-sudo tee /mnt/data-disk/test.txt
+# Ghi dữ liệu vào partition
+sudo tee /mnt/data/cr7_goat_mindsets.txt << 'EOF'
+1. WORK ETHIC: Talent without hard work is absolutely nothing.
+2. SELF-BELIEF: In my mind, I am always the best.
+3. RESILIENCE: Your hate makes me completely unstoppable. SIUUU!
+4. OBSESSION: Never settle for good enough, chase perfection daily.
+5. GOAL: Records are made to be broken by the GOAT!
+EOF
 
 # Đọc lại dữ liệu để xác nhận
-cat /mnt/data-disk/test.txt
+cat /mnt/data/cr7_goat_mindsets.txt
+
+df -h | grep /mnt/data
 ```
-
-> **Output đọc/ghi dữ liệu:**
->
-> _(Chèn ảnh output tại đây)_
-
+![alt text](image-3.png)
 
 ### Bước 4: Mở rộng dung lượng Partition lên 2 GB
 
-Truy cập GCP Console, chỉnh sửa disk đang gắn, tăng dung lượng lên **2 GB**. Sau đó quay lại VM thực hiện mở rộng partition và filesystem.
-
 ```bash
-# Unmount partition trước khi thao tác
-sudo umount /mnt/data-disk
+# Mở rộng partition 1 của ổ sdb
+sudo growpart /dev/sdb 1
 
-# Mở rộng partition với fdisk (xóa partition cũ, tạo lại với size mới)
-sudo fdisk /dev/sdb
+# Tháo mount ổ đĩa
+sudo umount /mnt/data
 
-# Kiểm tra partition sau khi mở rộng
-lsblk
-```
-
-```bash
-# Kiểm tra và sửa lỗi filesystem trước khi resize
+# Ép kiểm tra sửa lỗi hệ thống tệp (bắt buộc trước khi shrink)
 sudo e2fsck -f /dev/sdb1
 
-# Mở rộng filesystem để lấp đầy dung lượng partition mới
-sudo resize2fs /dev/sdb1
+# Thu nhỏ hệ thống tệp về đúng 2G (khi đã umount thì lệnh này sẽ chạy thành công)
+sudo resize2fs /dev/sdb1 2G
 
-# Mount lại partition
-sudo mount /dev/sdb1 /mnt/data-disk
+# Gắn (mount) lại ổ đĩa vào thư mục
+sudo mount /dev/sdb1 /mnt/data
 
-# Xác nhận dung lượng mới
-df -h
+# Xoá phân vùng và 
+sudo fdisk /dev/sdb
+# [Các bước trong fdisk: 
+# Nhập 'd' để xóa 
+#     -> Nhập 'n' tạo mới 
+#     -> Chọn 'p' -> Nhập '1' -> First Sector: Enter -> Last Sector: +2G 
+#     -> Chọn 'N' -> # Nhập 'w' để lưu]
+
+# Kiểm tra kết quả
+df -h | grep /mnt/data
 ```
-
-> **Output `df -h` — Partition sau khi mở rộng lên 2 GB:**
->
-> _(Chèn ảnh output tại đây)_
+![alt text](image-4.png)
+![alt text](image-5.png)
 
 ```bash
-# Thực hiện đọc/ghi dữ liệu sau khi mở rộng để xác nhận filesystem hoạt động bình thường
-echo "Partition expanded to 2GB successfully" | sudo tee /mnt/data-disk/test-expanded.txt
-cat /mnt/data-disk/test-expanded.txt
-ls -lh /mnt/data-disk/
-```
+# Ghi tiếp dữ liệu sau khi mở rộng để xác nhận filesystem hoạt động bình thường
+sudo tee -a /mnt/data/cr7_goat_mindsets.txt << 'EOF'
+6. DISCIPLINE: Consistency is the key to staying at the top.
+7. SACRIFICE: To be the best, you must sacrifice what others won't.
+8. COMPETITION: I love to prove the doubters wrong every single time.
+9. RECOVERY: Taking care of your body is just as important as training.
+10. LEGACY: I don't follow records, the records follow me. SIUUU!
+EOF
 
-> **Output đọc/ghi dữ liệu sau khi mở rộng:**
->
-> _(Chèn ảnh output tại đây)_
+# Kiểm tra và đọc lại dữ liệu
+cat /mnt/data/cr7_goat_mindsets.txt
+ls -lha /mnt/data/
+```
+![alt text](image-6.png)
 
 
 ### Kết quả Phần 1
@@ -148,34 +173,21 @@ Làm quen với Ceph CLI, trạng thái cluster, OSD và Pool thông qua việc 
 - **Cấu hình phần cứng khuyến nghị:** `n2-standard-4` (4 vCPUs, 16 GB RAM)
 - **Số lượng disk bổ sung:** 3 disk (dùng làm OSD), mỗi disk ~10 GB, **chưa được format**
 
----
 
 ### Bước 1: Chuẩn bị môi trường
 
 ```bash
-# Cập nhật hệ thống
+# Cập nhật danh sách gói và nâng cấp hệ thống lên phiên bản mới nhất
 sudo apt-get update && sudo apt-get upgrade -y
 
-# Cài đặt các gói phụ thuộc cần thiết
-sudo apt-get install -y python3 curl
+# Cài đặt các gói phụ thuộc bắt buộc:
+# - lvm2: Cần thiết để Ceph quản lý các phân vùng ổ đĩa thô dưới dạng Logical Volumes.
+# - podman/docker.io: Container engine để Cephadm khởi chạy các dịch vụ Ceph dưới dạng container.
+sudo apt-get install -y python3 curl ca-certificates lvm2 podman
 
-# Tải về và cài đặt cephadm
-curl --silent --remote-name --location https://download.ceph.com/rpm-2024.2/el9/noarch/cephadm
-chmod +x cephadm
-sudo mv cephadm /usr/local/bin/
-
-# Thêm Ceph repository
-sudo cephadm add-repo --release squid
-
-# Cài đặt ceph-common để có ceph CLI
-sudo cephadm install ceph-common
+# Cài đặt trực tiếp cephadm từ kho lưu trữ chính thức của Ubuntu 24.04 (Noble)
+sudo apt-get install -y cephadm ceph-common
 ```
-
-> **Output cài đặt cephadm:**
->
-> _(Chèn ảnh output tại đây)_
-
----
 
 ### Bước 2: Bootstrap Ceph Cluster
 
@@ -191,11 +203,7 @@ sudo cephadm bootstrap \
   --skip-monitoring-stack
 ```
 
-> **Output bootstrap cluster:**
->
-> _(Chèn ảnh output tại đây)_
-
----
+![alt text](image-7.png)
 
 ### Bước 3: Thêm 3 OSD vào Cluster
 
@@ -207,22 +215,11 @@ sudo ceph orch device ls
 
 # Thêm toàn bộ disk khả dụng làm OSD tự động
 sudo ceph orch apply osd --all-available-devices
-```
 
-> **Output `ceph orch device ls` và thêm OSD:**
->
-> _(Chèn ảnh output tại đây)_
-
-```bash
-# Chờ khoảng 1-2 phút để OSD được khởi tạo, sau đó kiểm tra
+# Chờ khoảng 1 phút để OSD được khởi tạo, sau đó kiểm tra
 sudo ceph osd tree
 ```
-
-> **Output `ceph osd tree` — 3 OSD:**
->
-> _(Chèn ảnh output tại đây)_
-
----
+![alt text](image-8.png)
 
 ### Bước 4: Kiểm tra trạng thái Cluster
 
@@ -231,42 +228,21 @@ sudo ceph osd tree
 ```bash
 sudo ceph -s
 ```
+![alt text](image-9.png)
 
-> **Output `ceph -s`:**
->
-> _(Chèn ảnh output tại đây)_
-
-#### 4.2 Kiểm tra chi tiết tình trạng sức khỏe
+#### 4.2 Kiểm tra chi tiết
 
 ```bash
+# Kiểm tra tình trạng sức khỏe
 sudo ceph health detail
-```
 
-> **Output `ceph health detail`:**
->
-> _(Chèn ảnh output tại đây)_
-
-#### 4.3 Kiểm tra cấu trúc OSD
-
-```bash
+# Kiểm tra cấu trúc OSD
 sudo ceph osd tree
-```
 
-> **Output `ceph osd tree`:**
->
-> _(Chèn ảnh output tại đây)_
-
-#### 4.4 Kiểm tra dung lượng cluster và pool
-
-```bash
+# Kiểm tra dung lượng cluster và pool
 sudo ceph df
 ```
-
-> **Output `ceph df`:**
->
-> _(Chèn ảnh output tại đây)_
-
----
+![alt text](image-10.png)
 
 ### Kết quả Phần 2
 
