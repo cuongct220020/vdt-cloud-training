@@ -1,4 +1,4 @@
-# Lab03 - Linux Storage Fundamentals & Ceph Cluster - VDT Cloud 2026
+# Lab03 - Linux Storage & Ceph Cluster - VDT Cloud 2026
 
 > Sinh viên: Đặng Tiến Cường - Đại Học Bách Khoa Hà Nội
 
@@ -17,6 +17,7 @@
 - **Công cụ sử dụng:** `fdisk`, `mkfs`, `mount`, `resize2fs`, `df`
 
 ### Bước 1. Tạo VM và gắn Raw Disk
+
 
 ```bash
 gcloud compute instances create cuongct-storage-lab \
@@ -42,7 +43,7 @@ gcloud compute instances create cuongct-storage-lab \
 # Thực hiện SSH vào server
 gcloud compute ssh cuongct-storage-lab 
 
-# Kiểm tra các disk hiện có và mount point
+# Kiểm tra các disk và mount point
 lsblk
 df -h
 ls -lha /mnt/
@@ -65,6 +66,7 @@ sudo mkfs.ext4 /dev/sdb1
 ```
 
 ![alt text](image-1.png)
+
 ### Bước 3: Mount partition và đọc/ghi dữ liệu
 
 ```bash
@@ -78,8 +80,8 @@ sudo mount /dev/sdb1 /mnt/data
 df -h
 ls -lha /mnt/
 ```
-![alt text](image-2.png)
 
+![alt text](image-2.png)
 
 ```bash
 # Ghi dữ liệu vào partition
