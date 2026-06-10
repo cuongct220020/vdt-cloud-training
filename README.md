@@ -1,6 +1,6 @@
 # VDT Cloud 2026 Training
 
-## 1. VDT Cloud 2026 Roadmap
+## 1. Cloud Track Roadmap
 
 ![VDT-Cloud-2026](VDT-Cloud-2026.png)
 
