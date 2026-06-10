@@ -1,6 +1,10 @@
 # VDT Cloud 2026 Training
 
-## Bản đồ Kiến trúc Đào tạo (Full-Stack AI Cloud)
+## 1. VDT Cloud 2026 Roadmap
+
+![VDT-Cloud-2026](VDT-Cloud-2026.png)
+
+## 2. Full-stack AI Cloud
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
