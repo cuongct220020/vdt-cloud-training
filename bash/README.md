@@ -15,50 +15,50 @@ The single learning documentation for this directory — following [roadmap.sh/s
 
 ### Các bài ở tier S - Production Grade Skill
 
-- [grep](S-tier/grep/)
-- [word-count](S-tier/word-count/)
-- [transpose](S-tier/transpose/)
-- [phone-number](S-tier/phone-number/)
-- [markdown](S-tier/markdown/)
-- [error-handling](S-tier/error-handling/)
-- [list-ops](S-tier/list-ops/)
-- [matching-brackets](S-tier/matching-brackets/)
-- [luhn](S-tier/luhn/)
-- [nucleotide-count](S-tier/nucleotide-count/)
-- [tournament](S-tier/tournament/)
-- [sublist](S-tier/sublist/)
-- [variable-length-quantity](S-tier/variable-length-quantity/)
+- [grep](S-tier/grep/) — reimplement a subset of grep's pattern-matching and flag behavior in bash
+- [word-count](S-tier/word-count/) — count occurrences of each word in text, handling punctuation, case, and contractions
+- [transpose](S-tier/transpose/) — transpose rows and columns of text, padding uneven line lengths correctly
+- [phone-number](S-tier/phone-number/) — clean and validate differently formatted NANP phone numbers into a standard format
+- [markdown](S-tier/markdown/) — refactor a working but messy markdown-to-html parser for readability
+- [error-handling](S-tier/error-handling/) — validate script argument count and exit with correct status codes
+- [list-ops](S-tier/list-ops/) — implement basic list operations (map, filter, reduce, reverse, etc.) from scratch
+- [matching-brackets](S-tier/matching-brackets/) — verify brackets, braces, and parentheses are balanced and nested correctly
+- [luhn](S-tier/luhn/) — validate identifier strings using the Luhn checksum algorithm
+- [nucleotide-count](S-tier/nucleotide-count/) — count occurrences of each DNA nucleotide in a sequence, erroring on invalid input
+- [tournament](S-tier/tournament/) — tally football match results into a ranked standings table
+- [sublist](S-tier/sublist/) — classify whether one list equals, contains, is contained by, or is unrelated to another
+- [variable-length-quantity](S-tier/variable-length-quantity/) — implement variable length quantity integer encoding and decoding
 
 
 ### Các bài ở tier A - Automation Skill Builder
 
-- [reverse-string](A-tier/reverse-string/)
-- [two-fer](A-tier/two-fer/)
-- [anagram](A-tier/anagram/)
-- [pangram](A-tier/pangram/)
-- [protein-translation](A-tier/protein-translation/)
-- [run-length-encoding](A-tier/run-length-encoding/)
-- [resistor-color](A-tier/resistor-color/)
-- [isbn-verifier](A-tier/isbn-verifier/)
-- [prime-factors](A-tier/prime-factors/)
-- [binary-search](A-tier/binary-search/)
-- [gigasecond](A-tier/gigasecond/)
-- [rectangles](A-tier/rectangles/)
-- [robot-simulator](A-tier/robot-simulator/)
-- [wordy](A-tier/wordy/)
-- [rotational-cipher](A-tier/rotational-cipher/)
-- [rail-fence-cipher](A-tier/rail-fence-cipher/)
+- [reverse-string](A-tier/reverse-string/) — reverse the characters of a given string
+- [two-fer](A-tier/two-fer/) — generate a "one for X, one for me" phrase given an optional name
+- [anagram](A-tier/anagram/) — find candidate words that are anagrams of a given target word
+- [pangram](A-tier/pangram/) — determine whether a sentence contains every letter of the alphabet
+- [protein-translation](A-tier/protein-translation/) — translate an RNA codon sequence into a sequence of amino acids
+- [run-length-encoding](A-tier/run-length-encoding/) — implement run-length encoding and decoding of repeated characters
+- [resistor-color](A-tier/resistor-color/) — look up numeric values encoded by resistor color bands
+- [isbn-verifier](A-tier/isbn-verifier/) — validate whether a string is a correctly formatted ISBN-10 number
+- [prime-factors](A-tier/prime-factors/) — compute the prime factors of a given natural number
+- [binary-search](A-tier/binary-search/) — implement binary search to find an item's position in a sorted list
+- [gigasecond](A-tier/gigasecond/) — calculate the date and time one gigasecond after a given date
+- [rectangles](A-tier/rectangles/) — count the rectangles formed by characters in an ASCII diagram
+- [robot-simulator](A-tier/robot-simulator/) — simulate a robot's position and facing direction from movement instructions
+- [wordy](A-tier/wordy/) — parse and evaluate simple arithmetic word problems into an integer answer
+- [rotational-cipher](A-tier/rotational-cipher/) — implement a Caesar/rot-n rotational cipher for encoding text
+- [rail-fence-cipher](A-tier/rail-fence-cipher/) — implement encoding and decoding for the zig-zag rail fence cipher
 
 ### Các bài ở tier B - Luyện tư duy logic (không sát production)
 
-- [difference-of-squares](B-tier/difference-of-squares/)
-- [allergies](B-tier/allergies/)
-- [armstrong-numbers](B-tier/armstrong-numbers/)
-- [darts](B-tier/darts/)
-- [knapsack](B-tier/knapsack/)
-- [poker](B-tier/poker/)
-- [change](B-tier/change/)
-- [two-bucket](B-tier/two-bucket/)
+- [difference-of-squares](B-tier/difference-of-squares/) — compute the difference between the square of the sum and sum of squares
+- [allergies](B-tier/allergies/) — determine a person's allergies from a bitmask-style allergy test score
+- [armstrong-numbers](B-tier/armstrong-numbers/) — determine whether a number is an Armstrong (narcissistic) number
+- [darts](B-tier/darts/) — calculate the score earned by a dart landing at given Cartesian coordinates
+- [knapsack](B-tier/knapsack/) — choose items maximizing value without exceeding a knapsack's weight capacity
+- [poker](B-tier/poker/) — pick the best poker hand(s) from a list of hands
+- [change](B-tier/change/) — compute the fewest coins needed to make a given amount of change
+- [two-bucket](B-tier/two-bucket/) — determine actions needed to measure an exact amount using two buckets
 
 ## Part 2 — Concept Notebook
 
@@ -967,6 +967,7 @@ Read a chapter, then go solve the matching exercise — that loop is the fastest
 -   [ ] Invalid input rejected
 -   [ ] All variables quoted `"${var}"`
 -   [ ] Uses `"$@"` instead of `$*`
+-   [ ] Provides `-h`/`--help` usage text
 
 
 ### 3. Stream and Pipeline Design
@@ -993,6 +994,7 @@ Read a chapter, then go solve the matching exercise — that loop is the fastest
 -   [ ] Handles special characters
 -   [ ] Exit codes are meaningful
 -   [ ] Success returns exit 0
+-   [ ] Exit codes follow a documented, stable contract (e.g. 0=success, 1=usage error, 2=runtime error) callers can rely on
 
 
 ### 6. Testability
@@ -1008,6 +1010,7 @@ Read a chapter, then go solve the matching exercise — that loop is the fastest
 -   [ ] Avoids non‑portable shell features
 -   [ ] Avoids unnecessary external dependencies
 -   [ ] Runs in minimal container environment
+-   [ ] Passes `shellcheck` with no unresolved warnings
 
 
 
@@ -1020,17 +1023,31 @@ Read a chapter, then go solve the matching exercise — that loop is the fastest
 
 
 
-### 9. DevOps Mindset Validation
+### 9. Security and Secrets Handling
+
+-   [ ] No hardcoded secrets, tokens, or credentials
+-   [ ] Secrets are never echoed or logged, including under `set -x`
+-   [ ] No `eval` or dynamically-built commands from untrusted/unsanitized input
+-   [ ] Temp files created with `mktemp`, never a predictable path
+-   [ ] Script does not require root/sudo unless the specific step needs it
+
+
+### 10. Idempotency and Operational Resilience
 
 Before marking done, confirm:
 
+-   [ ] Re-running the script is safe — no duplicate or corrupting side effects
+-   [ ] External calls (network, subprocess) have a timeout
+-   [ ] Transient failures are retried with backoff where appropriate
+-   [ ] Concurrent runs are guarded against (e.g. `flock`) if triggered by cron/CI
+-   [ ] Traps `INT`/`TERM` for graceful shutdown, not just `EXIT`
 -   [ ] Script can run in cron
 -   [ ] Script can run in CI
 -   [ ] Failure does not corrupt pipeline
 -   [ ] Script can be reused
 
 
-### 10. Completion Criteria
+### 11. Completion Criteria
 
 A script is considered complete only if:
 
