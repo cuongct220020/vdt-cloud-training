@@ -9,7 +9,7 @@ A personal learning repo for Bash shell scripting, following two external refere
 - **[roadmap.sh/shell-bash](https://roadmap.sh/shell-bash)** — the skill roadmap/curriculum this repo is structured around.
 - **[exercism.org/tracks/bash](https://exercism.org/tracks/bash/exercises)** — the source of the practice exercises themselves (problem statements in each exercise's `README.md` are adapted from Exercism).
 
-Exercises are organized into difficulty/purpose tiers rather than following Exercism's own track order. `REAME.md` (typo, not `README.md`) at the repo root is the authoritative list of which exercise belongs to which tier:
+Exercises are organized into difficulty/purpose tiers rather than following Exercism's own track order. `REAME.md` (typo, not `README.md`) at the repo root is the single learning doc for this directory, in three parts: Part 1 is the tier list below, Part 2 is a concept notebook following roadmap.sh/shell-bash, and Part 3 is the S-tier production checklist (see below). Part 1's tiers:
 
 - **S-tier** — "Production Grade Skill": exercises meant to be solved to a production-quality bar (see checklist below).
 - **A-tier** — "Automation Skill Builder": general scripting fluency exercises.
@@ -51,7 +51,7 @@ Script filenames are not perfectly consistent with their directory name (kebab-c
 
 ## S-tier production bar
 
-`bash_production_checklist.md` at the repo root is the review checklist that S-tier scripts must pass before being considered done. When writing or reviewing an S-tier exercise, hold it to this bar specifically:
+Part 3 of `REAME.md` ("Production Checklist") is the review checklist that S-tier scripts must pass before being considered done. When writing or reviewing an S-tier exercise, hold it to this bar specifically:
 
 - Structure: `#!/usr/bin/env bash`, `set -euo pipefail`, logic organized in functions with a `main()`, nothing significant at global scope.
 - Input handling: validate argument count and reject invalid/empty input; quote all variable expansions (`"${var}"`); use `"$@"` not `$*`.
