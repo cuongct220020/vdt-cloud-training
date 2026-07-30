@@ -935,15 +935,15 @@ This repo's exercises (see `bash/CLAUDE.md` for the tier system) are a direct ex
 
 | Concept area | Exercises |
 |---|---|
-| Exit codes / error handling (ch. 2, 12) | `S-tier/error-handling` |
-| Arrays, string manipulation (ch. 7) | `A-tier/reverse-string`, `A-tier/anagram`, `A-tier/rectangles`, `S-tier/transpose`, `S-tier/nucleotide-count` |
-| Arithmetic (ch. 7) | `A-tier/prime-factors`, `B-tier/armstrong-numbers`, `B-tier/difference-of-squares` |
-| Associative arrays (ch. 7) | `S-tier/tournament`, `S-tier/word-count`, `A-tier/resistor-color` |
-| Control flow / comparisons (ch. 8, 9) | `A-tier/robot-simulator`, `A-tier/wordy`, `S-tier/sublist` |
-| Functions (ch. 10) | `S-tier/list-ops` |
-| Bitwise / VLQ encoding (ch. 7, 8) | `S-tier/variable-length-quantity` |
-| Arrays as a stack (ch. 7) | `S-tier/matching-brackets` |
-| grep / regex / text processing (ch. 5) | `S-tier/grep`, `S-tier/phone-number`, `S-tier/markdown` |
+| Exit codes / error handling (ch. 2, 12) | [S-tier/error-handling](S-tier/error-handling/) |
+| Arrays, string manipulation (ch. 7) | [A-tier/reverse-string](A-tier/reverse-string/), [A-tier/anagram](A-tier/anagram/), [A-tier/rectangles](A-tier/rectangles/), [S-tier/transpose](S-tier/transpose/), [S-tier/nucleotide-count](S-tier/nucleotide-count/) |
+| Arithmetic (ch. 7) | [A-tier/prime-factors](A-tier/prime-factors/), [B-tier/armstrong-numbers](B-tier/armstrong-numbers/), [B-tier/difference-of-squares](B-tier/difference-of-squares/) |
+| Associative arrays (ch. 7) | [S-tier/tournament](S-tier/tournament/), [S-tier/word-count](S-tier/word-count/), [A-tier/resistor-color](A-tier/resistor-color/) |
+| Control flow / comparisons (ch. 8, 9) | [A-tier/robot-simulator](A-tier/robot-simulator/), [A-tier/wordy](A-tier/wordy/), [S-tier/sublist](S-tier/sublist/) |
+| Functions (ch. 10) | [S-tier/list-ops](S-tier/list-ops/) |
+| Bitwise / VLQ encoding (ch. 7, 8) | [S-tier/variable-length-quantity](S-tier/variable-length-quantity/) |
+| Arrays as a stack (ch. 7) | [S-tier/matching-brackets](S-tier/matching-brackets/) |
+| grep / regex / text processing (ch. 5) | [S-tier/grep](S-tier/grep/), [S-tier/phone-number](S-tier/phone-number/), [S-tier/markdown](S-tier/markdown/) |
 
 Read a chapter, then go solve the matching exercise — that loop is the fastest way to actually retain this.
 
