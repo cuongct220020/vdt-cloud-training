@@ -881,6 +881,88 @@ Scripts meant to be portable across distros shouldn't assume any one of these is
 
 Knowing minimal `vi`/`vim` survival commands is close to mandatory for ops work — you will eventually SSH into a box with nothing else installed.
 
+#### Vim normal-mode cheat sheet
+
+Everything below runs in **normal mode** (press `Esc` to get there from insert mode). Counts work as a prefix on most of these — `3dd` deletes 3 lines, `5j` moves down 5 lines.
+
+**Modes**
+
+| Key | Effect |
+|---|---|
+| `i` | insert before cursor |
+| `a` | insert (append) after cursor |
+| `I` | insert at start of line |
+| `A` | insert (append) at end of line |
+| `o` | open a new line below and insert |
+| `O` | open a new line above and insert |
+| `Esc` | back to normal mode |
+| `v` | visual mode (character-wise select) |
+| `V` | visual line mode (whole-line select) |
+| `Ctrl-v` | visual block mode (column select) |
+
+**Movement**
+
+| Key | Effect |
+|---|---|
+| `h` `j` `k` `l` | left / down / up / right |
+| `w` | jump to start of next word |
+| `b` | jump to start of previous word |
+| `e` | jump to end of current/next word |
+| `0` | move to the beginning of the line (column 0, ignores indentation) |
+| `^` | move to the first non-blank character of the line |
+| `$` | move to the end of the line |
+| `gg` | move to the beginning of the file (first line) |
+| `G` (i.e. `Shift+g`) | move to the end of the file (last line) |
+| `{n}G` or `:{n}` | jump to line number `n`, e.g. `42G` |
+| `Ctrl-d` / `Ctrl-u` | scroll half a page down / up |
+| `Ctrl-f` / `Ctrl-b` | scroll a full page forward / backward |
+| `%` | jump to the matching bracket/paren/brace |
+| `*` / `#` | jump to next / previous occurrence of the word under cursor |
+
+**Editing & deleting**
+
+| Key | Effect |
+|---|---|
+| `dd` | delete (cut) the current line |
+| `{n}dd` | delete `n` lines, e.g. `3dd` |
+| `dw` | delete to the start of the next word |
+| `d$` (or `D`) | delete to the end of the line |
+| `d0` | delete to the beginning of the line |
+| `x` | delete the character under the cursor |
+| `X` | delete the character before the cursor |
+| `yy` (or `Y`) | yank (copy) the current line |
+| `{n}yy` | yank `n` lines |
+| `p` | paste after the cursor / below the current line |
+| `P` | paste before the cursor / above the current line |
+| `u` | undo |
+| `Ctrl-r` | redo |
+| `.` | repeat the last change — very useful chained after a search |
+| `cc` | change (delete + insert) the current line |
+| `cw` | change to the end of the current word |
+| `r{char}` | replace a single character under the cursor |
+| `~` | toggle case of the character under the cursor |
+| `J` | join the current line with the next line |
+
+**Search & replace**
+
+| Key | Effect |
+|---|---|
+| `/pattern` | search forward for `pattern` |
+| `?pattern` | search backward for `pattern` |
+| `n` / `N` | repeat last search, same direction / opposite direction |
+| `:%s/old/new/g` | replace all occurrences of `old` with `new` in the whole file |
+| `:s/old/new/g` | replace all occurrences on the current line only |
+
+**Saving & quitting**
+
+| Key | Effect |
+|---|---|
+| `:w` | write (save) |
+| `:q` | quit (fails if there are unsaved changes) |
+| `:wq` (or `ZZ`) | save and quit |
+| `:q!` | quit and discard unsaved changes |
+| `:x` | save (only if modified) and quit |
+
 ---
 
 ### 20. Terminal Multiplexing & Sessions
