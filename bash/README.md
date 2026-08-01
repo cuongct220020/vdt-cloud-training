@@ -417,6 +417,19 @@ files=$(ls *.txt | wc -l)
 
 **Gotcha**: command substitution strips trailing newlines. Always quote the result when using it (`"$(cmd)"`) or word-splitting will silently mangle multi-word/multi-line output.
 
+#### Process substitution
+
+```bash
+diff <(sort list_a.txt) <(sort list_b.txt)          # <(...) — treat a command's output as a readable "file"
+./producer.sh > >(wc -l > count.txt) 2> >(wc -l > err_count.txt)   # >(...) — treat a command as a writable "file"
+```
+
+`<(cmd)` expands to a path bash hands the command (typically a `/dev/fd/N` entry), so anything expecting a *filename* — like `diff`, or a second positional arg — can take a live command's output without a temp file. `>(cmd)` is the mirror image: a path that, when written to, feeds `cmd`'s stdin.
+
+**Gotcha**: process substitution isn't the same as a pipe — `cmd1 | cmd2` connects two streams directly, while `cmd2 <(cmd1)` gives `cmd2` something that merely *looks like* a filename. This matters for commands like `diff` that need two real file-shaped arguments and can't take stdin for both sides.
+
+**Practice:** [`redirects_pipelines_lab/`](reset_redirects_pipelines_lab.sh) is a hands-on lab covering everything in this chapter — output/input/error redirection, pipes, `tee`, here-docs/here-strings, command substitution, process substitution (`<(...)` and `>(...)`), the pipe-subshell gotcha, and `pipefail` — via 16 goal/task blocks run against real sample files. It's disposable; run `./reset_redirects_pipelines_lab.sh -f` any time to regenerate the whole lab directory from scratch (same reset pattern as [`reset_vim_practices.sh`](reset_vim_practices.sh)).
+
 ---
 
 ### 7. Variables, Expansion & Data `[deep]`
@@ -1029,6 +1042,7 @@ This repo's exercises (see `bash/CLAUDE.md` for the tier system) are a direct ex
 | Arrays as a stack (ch. 7) | [S-tier/matching-brackets](S-tier/matching-brackets/) |
 | grep / regex / text processing (ch. 5) | [S-tier/grep](S-tier/grep/), [S-tier/phone-number](S-tier/phone-number/), [S-tier/markdown](S-tier/markdown/) |
 | Vim normal-mode commands (ch. 19) | [`vim_practices.txt`](vim_practices.txt) (reset anytime with [`reset_vim_practices.sh`](reset_vim_practices.sh)) |
+| Redirection, pipes, substitution (ch. 6) | `redirects_pipelines_lab/` (reset anytime with [`reset_redirects_pipelines_lab.sh`](reset_redirects_pipelines_lab.sh)) |
 
 Read a chapter, then go solve the matching exercise — that loop is the fastest way to actually retain this.
 

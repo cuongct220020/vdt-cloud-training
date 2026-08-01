@@ -1,0 +1,15 @@
+2026-08-01 09:00:01 INFO  server started on port 8080
+2026-08-01 09:00:15 INFO  health check passed
+2026-08-01 09:01:02 WARN  slow response time: 850ms
+2026-08-01 09:02:11 ERROR failed to reach upstream api
+2026-08-01 09:02:45 INFO  retry succeeded
+2026-08-01 09:03:30 ERROR database connection timeout
+2026-08-01 09:04:00 INFO  cache warmed
+2026-08-01 09:05:12 WARN  memory usage above 80%
+2026-08-01 09:06:20 ERROR failed to reach upstream api
+2026-08-01 09:07:01 INFO  request completed in 120ms
+2026-08-01 09:08:44 WARN  slow response time: 910ms
+2026-08-01 09:09:15 ERROR disk write failed
+2026-08-01 09:10:02 INFO  scheduled backup started
+2026-08-01 09:11:30 INFO  scheduled backup finished
+2026-08-01 09:12:05 ERROR failed to reach upstream api
