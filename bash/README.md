@@ -963,6 +963,8 @@ Everything below runs in **normal mode** (press `Esc` to get there from insert m
 | `:q!` | quit and discard unsaved changes |
 | `:x` | save (only if modified) and quit |
 
+**Practice:** [`vim_practices.txt`](vim_practices.txt) is a hands-on lab covering all 20 commands above, one goal + task block at a time. It's a disposable working copy — practice on it freely. To restart from a clean slate at any point, run [`reset_vim_practices.sh`](reset_vim_practices.sh) (`./reset_vim_practices.sh -f`), which regenerates the file from its own built-in template rather than relying on git or a backup copy.
+
 ---
 
 ### 20. Terminal Multiplexing & Sessions
@@ -1026,6 +1028,7 @@ This repo's exercises (see `bash/CLAUDE.md` for the tier system) are a direct ex
 | Bitwise / VLQ encoding (ch. 7, 8) | [S-tier/variable-length-quantity](S-tier/variable-length-quantity/) |
 | Arrays as a stack (ch. 7) | [S-tier/matching-brackets](S-tier/matching-brackets/) |
 | grep / regex / text processing (ch. 5) | [S-tier/grep](S-tier/grep/), [S-tier/phone-number](S-tier/phone-number/), [S-tier/markdown](S-tier/markdown/) |
+| Vim normal-mode commands (ch. 19) | [`vim_practices.txt`](vim_practices.txt) (reset anytime with [`reset_vim_practices.sh`](reset_vim_practices.sh)) |
 
 Read a chapter, then go solve the matching exercise — that loop is the fastest way to actually retain this.
 
