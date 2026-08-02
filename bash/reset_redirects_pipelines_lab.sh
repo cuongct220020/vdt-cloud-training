@@ -11,14 +11,28 @@ set -euo pipefail
 
 readonly DEFAULT_DIR="redirects_pipelines_lab"
 
+# Files this script owns/generates. Anything else found in output_dir
+# on a forced reset is considered lab-session cruft (out.txt, both.txt,
+# errors_only.log, stdout_count.txt, ...) and gets removed.
+readonly KEEP_FILES=(
+    "mixed_output.sh"
+    "access.log"
+    "list_a.txt"
+    "list_b.txt"
+    "raw_words.txt"
+    "README.md"
+)
+
 usage() {
     cat <<'USAGE'
 Usage: reset_redirects_pipelines_lab.sh [-f|--force] [-h|--help] [output_dir]
 
 Write a pristine redirection/pipes/substitution practice lab to
-output_dir (default: redirects_pipelines_lab in the current directory),
-overwriting any in-progress files so you can restart the lab from
-scratch.
+output_dir (default: redirects_pipelines_lab in the current directory).
+If output_dir already exists, -f/--force removes any stray temp files
+you created while working through the lab (out.txt, both.txt,
+errors_only.log, etc.) and rewrites the known fixtures, including
+README.md, from scratch.
 
 The lab covers: output redirection (>, >>), input redirection (<),
 error redirection (2>, 2>&1, &>, /dev/null), pipes, tee, here-docs,
@@ -113,7 +127,7 @@ dog
 EOF
 }
 
-write_tasks() {
+write_readme() {
     cat <<'TASKS_DOC'
 # Redirection / Pipes / Substitution Practice Lab
 
@@ -360,6 +374,28 @@ state.*
 TASKS_DOC
 }
 
+clean_stray_files() {
+    local dir=$1
+    local entry base keep k
+
+    for entry in "${dir}"/*; do
+        [[ -e "${entry}" ]] || continue
+
+        base="$(basename "${entry}")"
+        keep=0
+        for k in "${KEEP_FILES[@]}"; do
+            if [[ "${base}" == "${k}" ]]; then
+                keep=1
+                break
+            fi
+        done
+
+        if [[ "${keep}" -ne 1 ]]; then
+            rm -rf -- "${entry}"
+        fi
+    done
+}
+
 main() {
     local force=0
     local output_dir="${DEFAULT_DIR}"
@@ -386,9 +422,12 @@ main() {
         esac
     done
 
-    if [[ -e "${output_dir}" && "${force}" -ne 1 ]]; then
-        echo "reset_redirects_pipelines_lab.sh: '${output_dir}' already exists — use -f/--force to overwrite" >&2
-        exit 2
+    if [[ -e "${output_dir}" ]]; then
+        if [[ "${force}" -ne 1 ]]; then
+            echo "reset_redirects_pipelines_lab.sh: '${output_dir}' already exists — use -f/--force to overwrite" >&2
+            exit 2
+        fi
+        clean_stray_files "${output_dir}"
     fi
 
     mkdir -p "${output_dir}"
@@ -399,7 +438,7 @@ main() {
     write_list_a > "${output_dir}/list_a.txt"
     write_list_b > "${output_dir}/list_b.txt"
     write_raw_words > "${output_dir}/raw_words.txt"
-    write_tasks > "${output_dir}/TASKS.md"
+    write_readme > "${output_dir}/README.md"
 
     echo "reset_redirects_pipelines_lab.sh: wrote pristine lab to ${output_dir}/" >&2
 }
